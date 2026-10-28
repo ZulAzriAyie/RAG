@@ -174,7 +174,7 @@ def setup_agent(pdf_path_str: str, file_hash: str):
     if os.getenv("GROQ_API_KEY"):
         # Runs cloud LLM via Groq on Render
         llm = ChatGroq(
-            model_name="qwen-2.5-coder-32b",
+            model_name="qwen/qwen3.8-27b",
             temperature=0.0,
             api_key=os.getenv("GROQ_API_KEY"),
         )
