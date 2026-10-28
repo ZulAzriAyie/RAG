@@ -14,11 +14,11 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 import os
+from langchain_groq import ChatGroq
 from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 
 import streamlit as st
-from langchain_ollama import ChatOllama
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from src.config import get_langfuse_handler
