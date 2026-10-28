@@ -2,7 +2,7 @@
 app.py
 Production Academic Research Agent UI Entrypoint
 """
-
+import sys
 from pathlib import Path
 
 import streamlit as st
