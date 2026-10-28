@@ -1,0 +1,23 @@
+# Private secrets
+.env
+
+# SQLite Database & Indices
+data/checkpoints.db
+data/chroma_indices/
+data/raw_pdfs/*
+!data/raw_pdfs/.gitkeep
+
+# Virtual environments
+venv/
+env/
+
+# Python & Pytest caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# VS Code local settings
+.vscode/
+
+# Debug scripts
+debug_check.py

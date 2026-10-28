@@ -1,0 +1,44 @@
+[
+  {
+    "id": "eval_01",
+    "question": "Who is the author of this thesis?",
+    "expected_route": "metadata",
+    "required_page": 1,
+    "category": "metadata"
+  },
+  {
+    "id": "eval_02",
+    "question": "What is the official title of this research paper?",
+    "expected_route": "metadata",
+    "required_page": 1,
+    "category": "metadata"
+  },
+  {
+    "id": "eval_03",
+    "question": "List all the main chapters included in this thesis.",
+    "expected_route": "metadata",
+    "required_page": 1,
+    "category": "metadata"
+  },
+  {
+    "id": "eval_04",
+    "question": "Explain the path loss model and Equation 3.2.",
+    "expected_route": "search",
+    "required_page": 95,
+    "category": "technical_single_hop"
+  },
+  {
+    "id": "eval_05",
+    "question": "How is the Kalman Gain computed in the state update equations?",
+    "expected_route": "search",
+    "required_page": 78,
+    "category": "technical_single_hop"
+  },
+  {
+    "id": "eval_06",
+    "question": "Compare the Kalman Filter methodology in Chapter 2 with the path loss model in Chapter 3.",
+    "expected_route": "search",
+    "required_page": null,
+    "category": "multi_hop_comparison"
+  }
+]
