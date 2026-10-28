@@ -5,8 +5,9 @@ via Reciprocal Rank Fusion (RRF) and page diversity constraints.
 """
 
 from pathlib import Path
-from typing import List, Any
+from typing import List, Any, Union
 from pydantic import Field
+from langchain_core.embeddings import Embeddings
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
@@ -66,10 +67,14 @@ def build_hybrid_retriever(
     chunks: List[Document],
     chroma_dir: Path,
     collection_name: str,
-    embedding_model: str = "nomic-embed-text",
+    embedding_model: Union[str, Embeddings] = "nomic-embed-text",
 ) -> SimpleHybridRetriever:
     """Initializes or loads Chroma vector store and builds the hybrid retriever."""
-    embeddings = OllamaEmbeddings(model=embedding_model)
+    # Check whether a string name or pre-initialized Embeddings object was passed
+    if isinstance(embedding_model, str):
+        embeddings = OllamaEmbeddings(model=embedding_model)
+    else:
+        embeddings = embedding_model
 
     # Initialize Chroma store
     vector_store = Chroma(
