@@ -1,14 +1,29 @@
+# Web Interface & Application Framework
 streamlit>=1.30.0
+
+# LangChain Core & Ecosystem
 langchain>=0.2.0
 langchain-community>=0.2.0
 langchain-ollama>=0.1.0
 langchain-chroma>=0.1.0
+langchain-groq>=0.1.0
+
+# Graph State Machine & Persistence
 langgraph>=0.1.0
 langgraph-checkpoint-sqlite>=1.0.0
-pydantic>=2.0.0
+
+# Vector Database, Keyword Search & PDF Processing
 chromadb>=0.5.0
 rank_bm25>=0.2.2
+pymupdf>=1.23.0
 pypdf>=4.0.0
+
+# Data Validation & Schemas
+pydantic>=2.0.0
+
+# Telemetry & Observability
 langfuse>=2.0.0
+
+# Testing & Utilities
 pytest>=8.0.0
 python-dotenv>=1.0.0
