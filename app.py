@@ -13,6 +13,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
+import os
+from langchain_community.embeddings import FastEmbedEmbeddings
+from langchain_ollama import ChatOllama, OllamaEmbeddings
+
 import streamlit as st
 from langchain_ollama import ChatOllama
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -145,25 +149,45 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Agent Engine Factory ---
 @st.cache_resource(show_spinner="Indexing document and compiling LangGraph state machine...")
 def setup_agent(pdf_path_str: str, file_hash: str):
     pdf_path = Path(pdf_path_str)
     metadata_profile, chunks = extract_metadata_and_chunks(pdf_path)
+
+    # 1. Dynamic Embeddings Switch
+    if os.getenv("GROQ_API_KEY"):
+        # Runs lightweight CPU embeddings inside Render container
+        embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+    else:
+        # Runs local Ollama embeddings on your laptop
+        embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
     chroma_dir = CHROMA_BASE / f"chroma_{file_hash}"
     retriever = build_hybrid_retriever(
         chunks=chunks,
         chroma_dir=chroma_dir,
         collection_name=f"col_{file_hash}",
-        embedding_model="nomic-embed-text",
+        embedding_model=embeddings,  # Pass the dynamic embeddings object here
     )
 
-    llm = ChatOllama(
-        model="qwen2.5:7b",
-        temperature=0.0,
-        num_ctx=4096,
-    )
+    # 2. Dynamic LLM Switch
+    if os.getenv("GROQ_API_KEY"):
+        # Runs cloud LLM via Groq on Render
+        llm = ChatGroq(
+            model_name="qwen-2.5-32b",
+            temperature=0.0,
+            api_key=os.getenv("GROQ_API_KEY"),
+        )
+    else:
+        # Runs local Ollama on your computer
+        llm = ChatOllama(
+            model="qwen2.5:7b",
+            temperature=0.0,
+            num_ctx=4096,
+        )
+
+    # Return or compile graph using the dynamic `llm` and `retriever`
+    # ... rest of your graph compilation code ...
 
     conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
     checkpointer = SqliteSaver(conn)
