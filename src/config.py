@@ -21,14 +21,11 @@ _handler_instance: Optional[Any] = None
 def get_langfuse_handler(session_id: Optional[str] = None) -> Optional[Any]:
     """
     Initializes and returns a singleton Langfuse CallbackHandler.
-    Registers an automated atexit hook to guarantee flushing on worker termination.
-    
-    Accepts an optional session_id to maintain backwards compatibility while
-    allowing thread-level context enrichment.
+    Automatically reads LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, and LANGFUSE_HOST
+    from environment variables.
     """
     global _handler_instance
     if _handler_instance is not None:
-        # Update session_id if provided on subsequent calls
         if session_id and hasattr(_handler_instance, "session_id"):
             try:
                 _handler_instance.session_id = session_id
@@ -38,34 +35,29 @@ def get_langfuse_handler(session_id: Optional[str] = None) -> Optional[Any]:
 
     public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
     secret_key = os.getenv("LANGFUSE_SECRET_KEY")
-    host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
 
     if public_key and secret_key and "your-public-key" not in public_key:
         try:
+            # Import compatibility for newer langfuse SDK versions
             try:
                 from langfuse.callback import CallbackHandler
             except ImportError:
                 from langfuse.langchain import CallbackHandler
 
-            tags = ["production" if os.getenv("RENDER") else "development"]
+            # Instantiate without passing secret_key explicitly
+            # SDK reads LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, and LANGFUSE_HOST from env
+            _handler_instance = CallbackHandler()
 
-            handler_kwargs = {
-                "public_key": public_key,
-                "secret_key": secret_key,
-                "host": host,
-                "tags": tags,
-            }
-            if session_id:
-                handler_kwargs["session_id"] = session_id
-
-            _handler_instance = CallbackHandler(**handler_kwargs)
+            if session_id and hasattr(_handler_instance, "session_id"):
+                _handler_instance.session_id = session_id
 
             # Register automatic flush on Python process termination
             atexit.register(flush_langfuse)
 
+            print("[Observability Info] Langfuse CallbackHandler initialized successfully.")
             return _handler_instance
         except Exception as e:
-            logger.warning(f"[Observability Warning] Failed to initialize Langfuse handler: {e}")
+            print(f"[Observability Warning] Failed to initialize Langfuse handler: {e}")
             return None
 
     return None
